@@ -23,24 +23,25 @@ jobs:
           set -e
           ZIP_FILE=$(find . -maxdepth 1 -type f -name "NCA_Electrical_Android*.zip" | head -n 1)
           test -n "$ZIP_FILE"
-          echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+          echo "ZIP_FILE=$ZIP_FILE" >> "$GITHUB_ENV"
           echo "Found: $ZIP_FILE"
 
       - name: Extract project
         shell: bash
         run: |
+          set -e
           rm -rf extracted
           mkdir extracted
-          unzip "$ZIP_FILE" -d extracted
-          echo "Extracted files:"
-          find extracted -maxdepth 3 -type f | head -100
+          unzip -q "$ZIP_FILE" -d extracted
+          echo "Extracted."
 
       - name: Locate Gradle project
         shell: bash
         run: |
+          set -e
           PROJECT_DIR=$(find extracted -type f -name "settings.gradle" -printf '%h\n' | head -n 1)
           test -n "$PROJECT_DIR"
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Android project: $PROJECT_DIR"
 
       - name: Set up Java 17
@@ -49,48 +50,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android licenses
-        shell: bash
-        run: yes | sdkmanager --licenses >/dev/null || true
-
-      - name: Install Android SDK
-        shell: bash
-        run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
+      - name: Configure Android SDK
         shell: bash
         run: |
-          cd "$PROJECT_DIR"
-          gradle --no-daemon :app:assembleDebug --stacktrace
+          set -e
+          ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
 
-      - name: Locate APK
-        shell: bash
-        run: |
-          APK_FILE=$(find "$PROJECT_DIR/app/build/outputs/apk" -type f -name "*.apk" | head -n 1)
-          test -n "$APK_FILE"
-          echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
-          ls -lh "$APK_FILE"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager 2>/dev/null | head -n 1)
+          test -n "$SDKMANAGER"
 
-      - name: Create SHA256
-        shell: bash
-        run: |
-          sha256sum "$APK_FILE" > app-debug.apk.sha256
-          cp "$APK_FILE" app-debug.apk
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: NCA-Electrical-Suite-v2.2-debug
-          path: |
-            app-debug.apk
-            app-debug.apk.sha256
-          if-no-files-found: error
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;
