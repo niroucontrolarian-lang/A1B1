@@ -1,0 +1,35 @@
+{
+  "name": "nca-electrical-suite",
+  "version": "4.1.0",
+  "description": "NCA Electrical Engineering Suite",
+  "main": "main.js",
+  "author": "Niroo Control Arian (NCA) - Habib Shahbazi",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.nca.electrical.windows",
+    "productName": "NCA Electrical Suite",
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "artifactName": "NCA-Electrical-Suite-v${version}.${ext}"
+  }
+}

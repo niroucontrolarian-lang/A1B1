@@ -1,0 +1,22 @@
+{
+  "version": "2.2.0",
+  "required_files": {
+    "settings.gradle": true,
+    "build.gradle": true,
+    "app/build.gradle": true,
+    "app/src/main/AndroidManifest.xml": true,
+    "app/src/main/java/com/nca/electrical/MainActivity.java": true,
+    "app/src/main/assets/index.html": true,
+    ".github/workflows/android-build.yml": true
+  },
+  "status": "PASS",
+  "sha256": {
+    "settings.gradle": "73bc2b5f8728f05bef55a68adf842c9176438dc90e58ed419b66336aaa9c60d1",
+    "build.gradle": "c3c0cf04da0fc239f391c774554d97d890018ab6e37e87cc62f6070d0c8c9909",
+    "app/build.gradle": "2c64bac58ab9c5faea400fd10cc4581085501b8f1c2d9574a9637997e6375dc4",
+    "app/src/main/AndroidManifest.xml": "a31f89831ef8154087a3f5a74de8da709f5183305060e33f28512384ad3c0e1c",
+    "app/src/main/java/com/nca/electrical/MainActivity.java": "097fdb59b55c989b0e8066acc20b06e8b7c11dafb59878168f2602fc7925e3ff",
+    "app/src/main/assets/index.html": "9d63f859a44621da8533ffeac4afbf6f782403789b133f262d9ec403de25d127",
+    ".github/workflows/android-build.yml": "e0c2271aee68b5bba7f6da8b7c3d39ba96c8f2a74b84a0a6d4a7baf21c81e2b5"
+  }
+}

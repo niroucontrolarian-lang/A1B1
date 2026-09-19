@@ -1,0 +1,12 @@
+{
+  "motor()": true,
+  "cable()": true,
+  "transformer()": true,
+  "generator()": true,
+  "busbar()": true,
+  "pfcalc()": true,
+  "thermal()": true,
+  "protection()": true,
+  "version_3_0": true,
+  "five_languages": true
+}

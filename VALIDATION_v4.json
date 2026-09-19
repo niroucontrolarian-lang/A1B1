@@ -1,0 +1,11 @@
+{
+  "version_4": true,
+  "native_print": true,
+  "native_backup": true,
+  "native_restore": true,
+  "equipment_db": true,
+  "fault_module": true,
+  "coord_module": true,
+  "five_languages": true,
+  "release_workflow": true
+}
