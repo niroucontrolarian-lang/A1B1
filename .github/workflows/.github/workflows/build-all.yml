@@ -1,0 +1,93 @@
+name: NCA Electrical Suite - Android and Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        working-directory: android
+        shell: bash
+        run: gradle --no-daemon :app:assembleDebug --stacktrace
+
+      - name: Collect APK
+        shell: bash
+        run: |
+          APK=$(find android/app/build/outputs/apk/debug -type f -name "*.apk" | head -n 1)
+          test -n "$APK"
+          cp "$APK" NCA-Electrical-Suite-v4.1-debug.apk
+          sha256sum NCA-Electrical-Suite-v4.1-debug.apk > NCA-Electrical-Suite-v4.1-debug.apk.sha256
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NCA-Electrical-Suite-v4.1-Android
+          path: |
+            NCA-Electrical-Suite-v4.1-debug.apk
+            NCA-Electrical-Suite-v4.1-debug.apk.sha256
+          if-no-files-found: error
+
+  windows:
+    name: Build Windows EXE
+    runs-on: windows-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: windows
+        shell: pwsh
+        run: npm install
+
+      - name: Build portable EXE
+        working-directory: windows
+        shell: pwsh
+        run: npm run dist:win
+
+      - name: Collect EXE
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Path windows/dist -Filter *.exe -Recurse | Select-Object -First 1
+          if (-not $exe) { throw "EXE not found" }
+          Copy-Item $exe.FullName "NCA-Electrical-Suite-v4.1.exe"
+          (Get-FileHash "NCA-Electrical-Suite-v4.1.exe" -Algorithm SHA256).Hash | Out-File "NCA-Electrical-Suite-v4.1.exe.sha256"
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NCA-Electrical-Suite-v4.1-Windows
+          path: |
+            NCA-Electrical-Suite-v4.1.exe
+            NCA-Electrical-Suite-v4.1.exe.sha256
+          if-no-files-found: error
